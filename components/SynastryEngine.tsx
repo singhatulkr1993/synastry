@@ -129,8 +129,8 @@ const GhostBtn: React.CSSProperties = {
   width: "100%",
   padding: "var(--syn-space-3) var(--syn-space-6)",
   background: "transparent",
-  color: T.textM,
-  border: `1px solid ${T.border}`,
+  color: "#8A9A5B",
+  border: "1px solid #8A9A5B",
   borderRadius: "var(--syn-radius-full)",
   fontFamily: "var(--syn-font-body)",
   fontSize: "0.875rem",
@@ -316,10 +316,10 @@ export default function SynastryEngine() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Skip the welcome screen — landing page handles that
+  // Skip the welcome screen — landing page handles that. Runs on mount AND on reset (step → 0).
   useEffect(() => {
     if (step === 0) actions.goToStep(1);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [step]); // eslint-disable-line react-hooks/exhaustive-deps
   const [showBtB, setShowBtB] = useState(false);
   const [btModeB, setBtModeB] = useState<"exact" | "approximate">("exact");
 
@@ -552,39 +552,29 @@ export default function SynastryEngine() {
         .syn-dynamic-full { display: block; }
         .syn-dim-hint { display: none; }
         .syn-dim-hint { display: none; }
+
+        /* ── Print / Save as PDF ── */
+        @media print {
+          nav, button, .syn-share-row, .syn-no-print { display: none !important; }
+          /* Remove overflow:hidden so browser renders text, not composited bitmap */
+          * {
+            overflow: visible !important;
+            box-shadow: none !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+          .syn-reading-card { border: none !important; padding: 0 !important; }
+          /* Prevent sections from splitting across pages */
+          .syn-print-section { break-inside: avoid; page-break-inside: avoid; margin-bottom: 20px; }
+          /* Prevent individual dimension rows from splitting */
+          .syn-print-dim { break-inside: avoid; page-break-inside: avoid; }
+        }
       `}</style>
 
       <NavBar />
 
-      {/* ── WELCOME ── */}
-      {step === 0 && (
-        <div style={{ ...cntFade, textAlign: "center", paddingTop: "var(--syn-space-12)" }}>
-          <div style={{
-            fontFamily: "var(--syn-font-display)",
-            fontSize: "clamp(3rem, 10vw, 5rem)",
-            lineHeight: 1,
-            letterSpacing: "0.15em",
-            color: T.gold,
-            marginBottom: "var(--syn-space-6)",
-          }}>☽ ✦ ♀</div>
-          <h1 style={{ ...HS, fontSize: "clamp(2rem, 6vw, 3rem)", marginBottom: "var(--syn-space-4)" }}>
-            Your Relationship Analysis Begins Here
-          </h1>
-          <p style={{ ...Sub, maxWidth: 460, margin: "0 auto var(--syn-space-10)", fontSize: "1rem" }}>
-            Synastry maps the astrology, numerology, and behavioral signatures of two people together
-            — not just who you are, but how you move as a pair.
-          </p>
-          <button
-            style={{ ...Btn, maxWidth: 320, margin: "0 auto" }}
-            onClick={() => { track("flow_started"); actions.goToStep(1); }}
-          >
-            Begin My Analysis
-          </button>
-          <p style={{ fontSize: "0.75rem", color: T.textM, marginTop: "var(--syn-space-6)", lineHeight: 1.7, maxWidth: 380, margin: "var(--syn-space-6) auto 0" }}>
-            A reflection and conversation tool. Synastry does not predict outcomes or replace professional guidance.
-          </p>
-        </div>
-      )}
+      {/* ── WELCOME — blank shell to prevent flash before step 1 renders ── */}
+      {step === 0 && <div style={{ flex: 1, background: T.bg }} />}
 
       {/* ── STAGE + EMOTION ── */}
       {step === 1 && (
@@ -874,10 +864,6 @@ export default function SynastryEngine() {
                 })()}
               </span>
             </>
-            {(freeReport.pA.moonSign || freeReport.pA.venusSign) && <div style={{ fontSize: "0.8rem", color: T.textM, lineHeight: 1.6, marginTop: "var(--syn-space-2)", fontStyle: "italic" }}>
-              {[freeReport.pA.moonSign && `Moon in ${freeReport.pA.moonSign}`, freeReport.pA.venusSign && `Venus in ${freeReport.pA.venusSign}`].filter(Boolean).join(" · ")}
-              {freeReport.pA.isApproximate && " · Based on approximate birth time — directional only"}
-            </div>}
           </div>
 
           {/* Person B card */}
@@ -918,10 +904,6 @@ export default function SynastryEngine() {
                 })()}
               </span>
             </>
-            {(freeReport.pB.moonSign || freeReport.pB.venusSign) && <div style={{ fontSize: "0.8rem", color: T.textM, lineHeight: 1.6, marginTop: "var(--syn-space-2)", fontStyle: "italic" }}>
-              {[freeReport.pB.moonSign && `Moon in ${freeReport.pB.moonSign}`, freeReport.pB.venusSign && `Venus in ${freeReport.pB.venusSign}`].filter(Boolean).join(" · ")}
-              {freeReport.pB.isApproximate && " · Based on approximate birth time — directional only"}
-            </div>}
           </div>
 
           {/* Your Dynamic as a Pair — merged element + LP pair section */}
@@ -1240,7 +1222,7 @@ export default function SynastryEngine() {
               </div>
 
               {/* Overall score */}
-              <div style={{ ...CS, textAlign: "center", padding: "var(--syn-space-10)", border: `1px solid ${T.goldL}` }}>
+              <div className="syn-print-section" style={{ ...CS, textAlign: "center", padding: "var(--syn-space-10)", border: `1px solid ${T.goldL}` }}>
                 <div className="syn-score-large" style={{
                   fontFamily: "var(--syn-font-display)",
                   fontSize: "clamp(2.75rem, 12vw, 4.5rem)",
@@ -1268,7 +1250,7 @@ export default function SynastryEngine() {
               </div>
 
               {/* Five Dimensions — collapsible on mobile */}
-              <div style={{
+              <div className="syn-print-section" style={{
                 background: T.surface,
                 border: `1px solid ${T.border}`,
                 borderRadius: "var(--syn-radius-xl)",
@@ -1289,7 +1271,7 @@ export default function SynastryEngine() {
                 {reportData.dims.map((d, i) => {
                   const expanded = dimExpanded.length > 0 ? dimExpanded[i] : true;
                   return (
-                    <div key={i} style={{
+                    <div key={i} className="syn-print-dim" style={{
                       borderTop: i > 0 ? `1px solid ${T.border}` : "none",
                       overflow: "hidden",
                       wordWrap: "break-word" as const,
@@ -1380,7 +1362,7 @@ export default function SynastryEngine() {
               </div>
 
               {/* Dynamic as a Pair */}
-              <div style={{ background: "#FAFAF8", border: `1px solid ${T.border}`, borderRadius: 12, padding: 32, marginBottom: "var(--syn-space-3)", boxShadow: "var(--syn-shadow-sm)" }}>
+              <div className="syn-print-section" style={{ background: "#FAFAF8", border: `1px solid ${T.border}`, borderRadius: 12, padding: 32, marginBottom: "var(--syn-space-3)", boxShadow: "var(--syn-shadow-sm)" }}>
                 <h3 style={{ fontFamily: "var(--syn-font-display)", fontSize: "1.25rem", fontWeight: 500, marginBottom: 20, color: T.gold, display: "flex", alignItems: "center", gap: 8 }}>
                   <IconInteraction size={18} color={T.gold} />
                   Your Dynamic as a Pair
@@ -1427,7 +1409,7 @@ export default function SynastryEngine() {
               </div>
 
               {/* Core Strength */}
-              <div style={{ ...CS, borderLeft: `3px solid ${T.success}`, padding: "var(--syn-space-6)" }}>
+              <div className="syn-print-section" style={{ ...CS, borderLeft: `3px solid ${T.success}`, padding: "var(--syn-space-6)" }}>
                 <h3 style={{ fontFamily: "var(--syn-font-display)", fontSize: "1.1rem", fontWeight: 500, color: T.success, marginBottom: "var(--syn-space-3)" }}>
                   ✦ Core Strength — {getFirstName(reportData.best.name)}
                 </h3>
@@ -1446,7 +1428,7 @@ export default function SynastryEngine() {
               </div>
 
               {/* Growth Area */}
-              <div style={{ ...CS, borderLeft: `3px solid ${T.rose}`, padding: "var(--syn-space-6)" }}>
+              <div className="syn-print-section" style={{ ...CS, borderLeft: `3px solid ${T.rose}`, padding: "var(--syn-space-6)" }}>
                 <h3 style={{ fontFamily: "var(--syn-font-display)", fontSize: "1.1rem", fontWeight: 500, color: T.rose, marginBottom: "var(--syn-space-3)" }}>
                   ↗ Growth Area — {getFirstName(reportData.worst.name)}
                 </h3>
@@ -1465,7 +1447,7 @@ export default function SynastryEngine() {
               </div>
 
               {/* Nudges */}
-              <div style={{ background: "#FAFAF8", border: `1px solid ${T.border}`, borderRadius: 12, padding: 32, marginBottom: "var(--syn-space-3)", boxShadow: "var(--syn-shadow-sm)" }}>
+              <div className="syn-print-section" style={{ background: "#FAFAF8", border: `1px solid ${T.border}`, borderRadius: 12, padding: 32, marginBottom: "var(--syn-space-3)", boxShadow: "var(--syn-shadow-sm)" }}>
                 <h3 style={{ fontFamily: "var(--syn-font-display)", fontSize: "1.1rem", fontWeight: 600, color: "#D4AF37", marginBottom: 24, display: "flex", alignItems: "center", gap: 8 }}>
                   <IconEmotional size={18} color="#D4AF37" />
                   Invitations to Try
@@ -1481,7 +1463,7 @@ export default function SynastryEngine() {
               </div>
 
               {/* Stage context */}
-              <div className="syn-stage-card" style={{ ...CS, background: T.goldT, border: `1px solid ${T.goldL}`, padding: "var(--syn-space-6)" }}>
+              <div className="syn-stage-card syn-print-section" style={{ ...CS, background: T.goldT, border: `1px solid ${T.goldL}`, padding: "var(--syn-space-6)" }}>
                 <div className="syn-stage-label" style={{ fontSize: "0.85rem", fontWeight: 600, color: T.goldD, marginBottom: "var(--syn-space-2)" }}>{stageLabel}</div>
                 <div className="syn-strength-growth" style={{ fontSize: "0.875rem", color: T.textS, lineHeight: 1.8 }}>
                   {stage === "screening" && `These patterns suggest what to explore in early conversations. Pay particular attention to ${getFirstName(reportData.worst.name)} — not as a dealbreaker, but as a topic to explore openly before investing further. The strength in ${getFirstName(reportData.best.name)} is a genuine positive signal worth noticing.`}
@@ -1497,6 +1479,27 @@ export default function SynastryEngine() {
               <div style={{ marginTop: "var(--syn-space-5)" }}>
                 <div style={{ fontSize: "0.75rem", color: T.textM, marginBottom: "var(--syn-space-1)" }}>Share</div>
                 {makeShareRow(reportData.avg.toFixed(1))}
+                <button
+                  className="syn-no-print"
+                  style={{
+                    background: "none",
+                    border: `1px solid var(--syn-border-strong)`,
+                    color: "#1A1A1A",
+                    borderRadius: "var(--syn-radius-md)",
+                    padding: "var(--syn-space-2) var(--syn-space-4)",
+                    fontSize: "0.8rem",
+                    fontWeight: 500,
+                    cursor: "pointer",
+                    fontFamily: "var(--syn-font-body)",
+                    marginTop: "var(--syn-space-2)",
+                    transition: "background 150ms ease, border-color 150ms ease",
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "var(--syn-gold-tint)"; e.currentTarget.style.borderColor = "var(--syn-gold)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.borderColor = "var(--syn-border-strong)"; }}
+                  onClick={() => window.print()}
+                >
+                  Save as PDF
+                </button>
               </div>
               <button className="syn-btn-secondary" style={GhostBtn} onClick={actions.reset}>Begin a New Analysis</button>
             </div>

@@ -3,6 +3,8 @@ import "./globals.css";
 import ScrollToTop from "@/components/ScrollToTop";
 import { Suspense } from "react";
 import { CSSHealthCheck } from "@/components/CSSHealthCheck";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "Synastry — Celestial Compatibility",
@@ -22,6 +24,8 @@ export default function RootLayout({
           <ScrollToTop />
         </Suspense>
         <CSSHealthCheck />
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
