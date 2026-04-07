@@ -1,0 +1,196 @@
+@import '../styles/tokens.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  min-height: 100vh;
+}
+
+body {
+  background-color: var(--syn-bg);
+  color: var(--syn-text-primary);
+  font-family: var(--syn-font-body);
+  font-size: var(--syn-text-base);
+  line-height: var(--syn-leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+img, svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ── Mobile layout ── */
+@media (max-width: 480px) {
+  /* Prevent any element from busting out of viewport */
+  p, h1, h2, h3, h4, span {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Score display */
+  .syn-score-large {
+    font-size: clamp(2.75rem, 12vw, 4.5rem) !important;
+  }
+
+  /* Share row stacks on mobile */
+  .syn-share-row {
+    flex-direction: column;
+  }
+  .syn-share-row button {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* Display typography */
+.syn-display {
+  font-family: var(--syn-font-display);
+  font-weight: var(--syn-weight-light);
+  line-height: var(--syn-leading-tight);
+  letter-spacing: var(--syn-tracking-tight);
+}
+
+/* Gold divider */
+.syn-divider {
+  width: 48px;
+  height: 1px;
+  background: var(--syn-gradient-gold);
+  margin: 0 auto;
+}
+
+/* Smooth focus rings */
+*:focus-visible {
+  outline: 2px solid var(--syn-gold);
+  outline-offset: 3px;
+  border-radius: var(--syn-radius-sm);
+}
+
+/* Input base */
+.syn-input {
+  width: 100%;
+  padding: var(--syn-space-3) var(--syn-space-4);
+  background: var(--syn-surface);
+  border: 1px solid var(--syn-border);
+  border-radius: var(--syn-radius-md);
+  font-family: var(--syn-font-body);
+  font-size: var(--syn-text-base);
+  color: var(--syn-text-primary);
+  transition: border-color var(--syn-duration-fast) var(--syn-ease-out),
+              box-shadow var(--syn-duration-fast) var(--syn-ease-out);
+}
+
+.syn-input:focus {
+  outline: none;
+  border-color: var(--syn-gold);
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+}
+
+.syn-input::placeholder {
+  color: var(--syn-text-muted);
+}
+
+/* Button variants */
+.syn-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--syn-space-2);
+  padding: var(--syn-space-4) var(--syn-space-8);
+  background: var(--syn-gradient-gold);
+  color: var(--syn-navy);
+  font-family: var(--syn-font-body);
+  font-size: var(--syn-text-sm);
+  font-weight: var(--syn-weight-semibold);
+  letter-spacing: var(--syn-tracking-wider);
+  text-transform: uppercase;
+  border: none;
+  border-radius: var(--syn-radius-full);
+  cursor: pointer;
+  box-shadow: var(--syn-shadow-gold);
+  transition: transform var(--syn-duration-fast) var(--syn-ease-spring),
+              box-shadow var(--syn-duration-fast) var(--syn-ease-out);
+}
+
+.syn-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--syn-shadow-glow);
+}
+
+.syn-btn-primary:active {
+  transform: translateY(0);
+}
+
+.syn-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--syn-space-2);
+  padding: var(--syn-space-3) var(--syn-space-6);
+  background: transparent;
+  color: var(--syn-gold);
+  font-family: var(--syn-font-body);
+  font-size: var(--syn-text-sm);
+  font-weight: var(--syn-weight-medium);
+  letter-spacing: var(--syn-tracking-wide);
+  border: 1px solid var(--syn-gold);
+  border-radius: var(--syn-radius-full);
+  cursor: pointer;
+  transition: background var(--syn-duration-fast) var(--syn-ease-out),
+              color var(--syn-duration-fast) var(--syn-ease-out);
+}
+
+.syn-btn-ghost:hover {
+  background: var(--syn-gold-tint);
+  color: var(--syn-gold-dark);
+}
+
+/* Card */
+.syn-card {
+  background: var(--syn-surface);
+  border: 1px solid var(--syn-border);
+  border-radius: var(--syn-radius-xl);
+  box-shadow: var(--syn-shadow-md);
+}
+
+/* Score ring animation */
+@keyframes syn-draw {
+  from { stroke-dashoffset: 314; }
+  to   { stroke-dashoffset: var(--syn-dash-offset, 0); }
+}
+
+/* Fade up entry */
+@keyframes syn-fade-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.syn-fade-up {
+  animation: syn-fade-up var(--syn-duration-slow) var(--syn-ease-out) both;
+}
+
+/* Shimmer for loading */
+@keyframes syn-shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.syn-shimmer {
+  background: linear-gradient(90deg, var(--syn-bg-alt) 25%, var(--syn-border) 37%, var(--syn-bg-alt) 63%);
+  background-size: 800px 100%;
+  animation: syn-shimmer 1.6s ease-in-out infinite;
+}
