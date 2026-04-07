@@ -225,7 +225,7 @@ export default function LandingPage() {
         alignItems: "center",
         justifyContent: "center",
         textAlign: "center",
-        padding: "var(--syn-space-20) var(--syn-space-6)",
+        padding: "var(--syn-space-20) var(--syn-space-6) 8rem",
         position: "relative",
         overflow: "hidden",
       }}>
