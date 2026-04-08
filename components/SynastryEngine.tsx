@@ -322,6 +322,7 @@ export default function SynastryEngine() {
   }, [step]); // eslint-disable-line react-hooks/exhaustive-deps
   const [showBtB, setShowBtB] = useState(false);
   const [btModeB, setBtModeB] = useState<"exact" | "approximate">("exact");
+  const [pdfLoading, setPdfLoading] = useState(false);
 
   const validate = (): boolean => {
     const errs: InputErrors = {};
@@ -1489,16 +1490,26 @@ export default function SynastryEngine() {
                     padding: "var(--syn-space-2) var(--syn-space-4)",
                     fontSize: "0.8rem",
                     fontWeight: 500,
-                    cursor: "pointer",
+                    cursor: pdfLoading ? "not-allowed" : "pointer",
                     fontFamily: "var(--syn-font-body)",
                     marginTop: "var(--syn-space-2)",
+                    opacity: pdfLoading ? 0.7 : 1,
                     transition: "background 150ms ease, border-color 150ms ease",
                   }}
-                  onMouseEnter={e => { e.currentTarget.style.background = "var(--syn-gold-tint)"; e.currentTarget.style.borderColor = "var(--syn-gold)"; }}
+                  disabled={pdfLoading}
+                  onMouseEnter={e => { if (!pdfLoading) { e.currentTarget.style.background = "var(--syn-gold-tint)"; e.currentTarget.style.borderColor = "var(--syn-gold)"; }}}
                   onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.borderColor = "var(--syn-border-strong)"; }}
-                  onClick={() => window.print()}
+                  onClick={async () => {
+                    setPdfLoading(true);
+                    try {
+                      const { generateSynastryPDF } = await import("@/lib/generatePdf");
+                      await generateSynastryPDF(reportData!, freeReport!, personA, personB, stage);
+                    } finally {
+                      setPdfLoading(false);
+                    }
+                  }}
                 >
-                  Save as PDF
+                  {pdfLoading ? "Generating PDF..." : "Download Report (PDF)"}
                 </button>
               </div>
               <button className="syn-btn-secondary" style={GhostBtn} onClick={actions.reset}>Begin a New Analysis</button>
