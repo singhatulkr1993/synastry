@@ -1503,7 +1503,7 @@ export default function SynastryEngine() {
                     setPdfLoading(true);
                     try {
                       const { generateSynastryPDF } = await import("@/lib/generatePdf");
-                      await generateSynastryPDF(reportData!, freeReport!, personA, personB, stage);
+                      await generateSynastryPDF(reportData!, freeReport!, personA, personB, stage ?? 'ongoing');
                     } finally {
                       setPdfLoading(false);
                     }
